@@ -8,28 +8,42 @@
 
 import UIKit
 
-class CassiniViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+class CassiniViewController: UIViewController, UISplitViewControllerDelegate {
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        self.splitViewController?.delegate = self
     }
     
-
-    /*
     // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if let url = DemoURL.NASA[segue.identifier ?? ""] {
+            if let imageVC = (segue.destination.contents as? ImageViewController) {
+                imageVC.imageURL = url
+                imageVC.title = (sender as? UIButton)?.currentTitle
+            }
+        }
     }
-    */
-
+    
+    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
+        if primaryViewController.contents == self {
+            if let imageVC = secondaryViewController.contents as? ImageViewController, imageVC.imageURL == nil {
+                return true
+            }
+        }
+        return false
+    }
 }
+
+extension UIViewController
+{
+    var contents: UIViewController {
+        if let navcon = self as? UINavigationController {
+            return navcon.visibleViewController ?? self
+        } else {
+            return self
+        }
+    }
+}
+
+
